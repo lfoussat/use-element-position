@@ -27,17 +27,17 @@ const useElementPositionLegacy = callback =>
     return () => window.removeEventListener('resize', onResize)
   })
 
-export const useElementPositionCallback = ResizeObserver
+const useElementPositionCallback = ResizeObserver
   ? useElementPositionModern
   : useElementPositionLegacy
 
-export const useElementPosition = defaultValue => {
+const useElementPosition = defaultValue => {
   const [rect, setRect] = useState(defaultValue)
   const ref = useElementPositionCallback(setRect)
   return [ref, rect]
 }
 
-export const WithPosition = ({ children, ...props }) => {
+const WithPosition = ({ children, ...props }) => {
   const [ref, rect] = useElementPosition(new DOMRect())
   const rectProps = {
     bottom: rect.bottom,
@@ -55,4 +55,10 @@ export const WithPosition = ({ children, ...props }) => {
     { ref, ...props },
     React.Children.map(children, child => React.cloneElement(child, rectProps))
   )
+}
+
+module.exports = {
+  useElementPositionCallback,
+  useElementPosition,
+  WithPosition
 }
