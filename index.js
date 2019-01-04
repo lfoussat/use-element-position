@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useElementCallback } from 'use-element'
+const { useState } = require('react')
+const { useElementCallback } = require('use-element')
 
 const { ResizeObserver } = window
 
