@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useElementCallback } from 'use-element'
+import { useElementCallback } from 'use-element/index.mjs'
 
 const { ResizeObserver } = window
 
