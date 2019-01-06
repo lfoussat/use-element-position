@@ -7,13 +7,13 @@ exports.WithPosition = exports.useElementPosition = exports.useElementPositionCa
 
 var _react = require("react");
 
-var _index = require("use-element/index.mjs");
+var _useElement = require("use-element");
 
 const {
   ResizeObserver
 } = window;
 
-const useElementPositionModern = callback => (0, _index.useElementCallback)(elem => {
+const useElementPositionModern = callback => (0, _useElement.useElementCallback)(elem => {
   const observer = new ResizeObserver(() => {
     callback(elem.getBoundingClientRect());
   });
@@ -21,7 +21,7 @@ const useElementPositionModern = callback => (0, _index.useElementCallback)(elem
   return () => observer.unobserve(elem);
 });
 
-const useElementPositionLegacy = callback => (0, _index.useElementCallback)(elem => {
+const useElementPositionLegacy = callback => (0, _useElement.useElementCallback)(elem => {
   // fallback to window resize
   const onResize = () => {
     callback(elem.getBoundingClientRect());
