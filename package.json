@@ -2,11 +2,11 @@
   "name": "use-element-position",
   "version": "1.0.5",
   "description": "React hook to get bounding client rect",
-  "main": "index.js",
-  "module": "index.mjs",
+  "main": "index.build.js",
+  "module": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "mjs-to-js ."
+    "build": "schwarzy ."
   },
   "repository": {
     "type": "git",
@@ -22,9 +22,9 @@
     "react": "^16.7.0"
   },
   "dependencies": {
-    "use-element": "^1.0.4"
+    "use-element": "^1.0.5"
   },
   "devDependencies": {
-    "mjs-to-js": "0.0.2"
+    "schwarzy": "0.0.3"
   }
 }
