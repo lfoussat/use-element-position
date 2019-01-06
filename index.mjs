@@ -1,5 +1,5 @@
-const { useState } = require('react')
-const { useElementCallback } = require('use-element')
+import { useState } from 'react'
+import { useElementCallback } from 'use-element'
 
 const { ResizeObserver } = window
 
@@ -27,17 +27,17 @@ const useElementPositionLegacy = callback =>
     return () => window.removeEventListener('resize', onResize)
   })
 
-const useElementPositionCallback = ResizeObserver
+export const useElementPositionCallback = ResizeObserver
   ? useElementPositionModern
   : useElementPositionLegacy
 
-const useElementPosition = defaultValue => {
+export const useElementPosition = defaultValue => {
   const [rect, setRect] = useState(defaultValue)
   const ref = useElementPositionCallback(setRect)
   return [ref, rect]
 }
 
-const WithPosition = ({ children, ...props }) => {
+export const WithPosition = ({ children, ...props }) => {
   const [ref, rect] = useElementPosition(new DOMRect())
   const rectProps = {
     bottom: rect.bottom,
@@ -57,8 +57,3 @@ const WithPosition = ({ children, ...props }) => {
   )
 }
 
-module.exports = {
-  useElementPositionCallback,
-  useElementPosition,
-  WithPosition
-}
