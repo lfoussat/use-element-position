@@ -1,6 +1,6 @@
 {
   "name": "use-element-position",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "React hook to get bounding client rect",
   "main": "index.build.js",
   "module": "index.js",
