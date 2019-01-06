@@ -22,7 +22,7 @@
     "react": "^16.7.0"
   },
   "dependencies": {
-    "use-element": "^1.0.5"
+    "use-element": "^1.0.8"
   },
   "devDependencies": {
     "schwarzy": "0.0.3"
