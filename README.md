@@ -38,5 +38,4 @@ const MyWrapperComponent = () => (
 
 You can retrieve all the properties included in [`getBoundingClientRect`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) :
 bottom, height, left, right, top, width, x, y
-
-
+You can also retrieve offsetTop and offsetLeft's values of your element.

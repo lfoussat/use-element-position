@@ -3,10 +3,26 @@ import { useElementCallback } from 'use-element'
 
 const { ResizeObserver } = window
 
+const getElementPosition = elem => {
+  const rect = elem.getBoundingClientRect()
+  return {
+    bottom: rect.bottom,
+    height: rect.height,
+    left: rect.left,
+    right: rect.right,
+    top: rect.top,
+    width: rect.width,
+    x: rect.x,
+    y: rect.y,
+    offsetTop: elem.offsetTop,
+    offsetLeft: elem.offsetLeft
+  }
+}
+
 const useElementPositionModern = callback =>
   useElementCallback(elem => {
     const observer = new ResizeObserver(() => {
-      callback(elem.getBoundingClientRect())
+      callback(getElementPosition(elem))
     })
 
     observer.observe(elem)
@@ -18,7 +34,7 @@ const useElementPositionLegacy = callback =>
   useElementCallback(elem => {
     // fallback to window resize
     const onResize = () => {
-      callback(elem.getBoundingClientRect())
+      callback(getElementPosition(elem))
     }
 
     onResize() // initial value
@@ -38,22 +54,22 @@ export const useElementPosition = defaultValue => {
 }
 
 export const WithPosition = ({ children, ...props }) => {
-  const [ref, rect] = useElementPosition(new DOMRect())
-  const rectProps = {
-    bottom: rect.bottom,
-    height: rect.height,
-    left: rect.left,
-    right: rect.right,
-    top: rect.top,
-    width: rect.width,
-    x: rect.x,
-    y: rect.y
-  }
+  const [ref, rect] = useElementPosition({
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+    offsetTop: 0,
+    offsetLeft: 0
+  })
 
   return React.createElement(
     'div',
     { ref, ...props },
-    React.Children.map(children, child => React.cloneElement(child, rectProps))
+    React.Children.map(children, child => React.cloneElement(child, rect))
   )
 }
-
