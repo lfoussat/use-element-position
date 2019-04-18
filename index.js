@@ -15,37 +15,108 @@ const getElementPosition = elem => {
     x: rect.x,
     y: rect.y,
     offsetTop: elem.offsetTop,
-    offsetLeft: elem.offsetLeft
+    offsetLeft: elem.offsetLeft,
   }
 }
 
-const useElementPositionModern = callback =>
-  useElementCallback(elem => {
-    const observer = new ResizeObserver(() => {
-      callback(getElementPosition(elem))
-    })
+const nextFrameSubs = new Set()
+const callAllFrameSubs = () => {
+  for (const sub of nextFrameSubs) {
+    sub()
+  }
+}
 
-    observer.observe(elem)
-
-    return () => observer.unobserve(elem)
-  })
-
-const useElementPositionLegacy = callback =>
-  useElementCallback(elem => {
-    // fallback to window resize
-    const onResize = () => {
-      callback(getElementPosition(elem))
+let RAFId
+const afterNextFrame = sub => {
+  if (!nextFrameSubs.size) {
+    nextFrameLoop()
+  }
+  nextFrameSubs.add(sub)
+  return () => {
+    nextFrameSubs.delete(sub)
+    if (!nextFrameSubs.size) {
+      cancelAnimationFrame(RAFId)
     }
+  }
+}
 
-    onResize() // initial value
-    window.addEventListener('resize', onResize, { passive: true }) // resized values
+const nextFrameLoop = () => {
+  setTimeout(callAllFrameSubs, 0)
+  RAFId = requestAnimationFrame(nextFrameLoop)
+}
 
-    return () => window.removeEventListener('resize', onResize)
-  })
+const observeElem = (observers, elem, initialState) => {
+  const cachedObserver = observers.get(elem)
+  if (cachedObserver) return cachedObserver
+  const newObserver = { state: initialState, callbacks: new Set() }
+  observers.set(elem, newObserver)
+  return newObserver
+}
 
-export const useElementPositionCallback = ResizeObserver
-  ? useElementPositionModern
-  : useElementPositionLegacy
+const triggerCallbacks = (callbacks, newState) => {
+  for (const cb of callbacks) {
+    cb(newState)
+  }
+}
+
+const observeDOM = (getter, hasChanged) => {
+  const observers = new Map()
+  let unsub
+  const sub = () => {
+    for (const [elem, observer] of observers) {
+      const newState = getter(elem)
+      if (hasChanged(newState, observer.state)) {
+        observer.state = newState
+        setTimeout(triggerCallbacks, 0, observer.callbacks, newState)
+      }
+    }
+  }
+
+  return (elem, callback, initialState) => {
+    if (!observers.size) {
+      unsub = afterNextFrame(sub)
+    }
+    const observe = observeElem(observers, elem, initialState)
+    observe.callbacks.add(callback)
+    return () => {
+      observe.callbacks.delete(callback)
+      if (!observe.callbacks.size) {
+        observers.delete(elem)
+        if (!observers.size) {
+          unsub()
+        }
+      }
+    }
+  }
+}
+
+const keys = [
+  'width',
+  'height',
+  'top',
+  'right',
+  'bottom',
+  'left',
+  'offsetTop',
+  'offsetLeft',
+]
+const observeRect = observeDOM(
+  elem => getElementPosition(elem),
+  (a, b) => {
+    let i = -1
+    if (a && !b) return true
+    while (++i < keys.length) {
+      const key = keys[i]
+      if (a[key] !== b[key]) return true
+    }
+    return false
+  },
+)
+
+const useElementPositionALaMano = callback =>
+  useElementCallback(elem => observeRect(elem, callback))
+
+export const useElementPositionCallback = useElementPositionALaMano
 
 export const useElementPosition = defaultValue => {
   const [rect, setRect] = useState(defaultValue)
@@ -64,12 +135,12 @@ export const WithPosition = ({ children, ...props }) => {
     x: 0,
     y: 0,
     offsetTop: 0,
-    offsetLeft: 0
+    offsetLeft: 0,
   })
 
   return React.createElement(
     'div',
     { ref, ...props },
-    React.Children.map(children, child => React.cloneElement(child, rect))
+    React.Children.map(children, child => React.cloneElement(child, rect)),
   )
 }
