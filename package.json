@@ -1,6 +1,6 @@
 {
   "name": "use-element-position",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "React hook to get bounding client rect",
   "main": "index.build.js",
   "module": "index.js",
@@ -20,9 +20,6 @@
   "homepage": "https://github.com/lfoussat/use-element-position#readme",
   "peerDependencies": {
     "react": "^16.7.0"
-  },
-  "dependencies": {
-    "use-element": "^1.0.13"
   },
   "devDependencies": {
     "schwarzy": "0.0.3"
